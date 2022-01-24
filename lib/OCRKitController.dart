@@ -3,9 +3,8 @@ import 'package:ocrkit/OCRKitView.dart';
 
 ///This controller is used to control CameraKiView.dart
 class OCRKitController {
-
-   MethodChannel? _channel;
-   late OCRKitView cameraKitView;
+  MethodChannel? _channel;
+  late OCRKitView cameraKitView;
 
   ///pause camera while stop camera preview.
   ///Plugin manage automatically pause camera based android, iOS lifecycle and widget visibility
@@ -29,17 +28,18 @@ class OCRKitController {
   Future<String> takePicture({String path = ""}) {
     return cameraKitView.viewState.controller!.takePicture(path);
   }
+
   ///Use this method for process image directly with path
   Future<String> processImageFromPath(String path) {
     return cameraKitView.viewState.controller!.processImageFromPath(path);
   }
 
   ///Use this method for process image directly with path without need ViewState
-  Future<dynamic> processImageFromPathWithoutView(String path)async {
-    if(_channel == null){
-      "${_channel = new MethodChannel('plugins/ocrkit')}";
+  Future<dynamic> processImageFromPathWithoutView(String path) async {
+    if (_channel == null) {
+      _channel = new MethodChannel('plugins/ocrkit');
     }
-    return "${_channel!.invokeMethod('processImageFromPath', {"path": path})}";
+    return _channel?.invokeMethod('processImageFromPath', {"path": path});
   }
 
   ///Change flash mode between auto, on and off
@@ -51,12 +51,13 @@ class OCRKitController {
   void setView(OCRKitView cameraKitView) {
     this.cameraKitView = cameraKitView;
   }
+
   ///Enable and disable scanning for text in live mode.
   void setScanForText(bool isScanningForText) {
     cameraKitView.viewState.controller!.setScanForText(isScanningForText);
   }
 
-  // initCamera() {
-  //   cameraKitView.viewState.controller.initCamera();
-  // }
+// initCamera() {
+//   cameraKitView.viewState.controller.initCamera();
+// }
 }
