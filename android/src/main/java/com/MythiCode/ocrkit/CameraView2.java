@@ -42,8 +42,6 @@ import androidx.annotation.RequiresApi;
 
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.TextRecognizerOptionsInterface;
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -313,7 +311,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
         this.previewFlashMode = flashMode;
 
         if (hasTextReader) {
-            recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+            recognizer = TextRecognition.getClient();
         }
 
         displaySize = new Point();
@@ -547,7 +545,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
             }
 
             if (recognizer == null && hasBarcodeReader) {
-                recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+                recognizer = TextRecognition.getClient();
             }
         }
     }

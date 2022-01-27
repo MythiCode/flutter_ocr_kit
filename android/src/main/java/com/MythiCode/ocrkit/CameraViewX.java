@@ -51,7 +51,6 @@ import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,7 +105,7 @@ public class CameraViewX implements CameraViewInterface {
         this.isTakePictureMode = isTakePictureMode;
         this.isScanningText = isScanningText;
         userCameraSelector = 0;
-        textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        textRecognizer = TextRecognition.getClient();
         displaySize = new Point();
         activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
         if (isFillScale == true) //fill
@@ -499,7 +498,7 @@ public class CameraViewX implements CameraViewInterface {
     public void resumeCamera2() {
         if (isCameraVisible) {
             if (textRecognizer == null)
-                textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+                textRecognizer = TextRecognition.getClient();
             startCamera();
         }
     }

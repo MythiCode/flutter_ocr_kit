@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ocrkit.iml" filepath="$PROJECT_DIR$/.idea/modules/ocrkit.iml" group="ocrkit" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ocrkit.iml" filepath="$PROJECT_DIR$/.idea/modules/ocrkit.iml" />
     </modules>
   </component>
 </project>
