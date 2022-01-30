@@ -58,8 +58,17 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: ElevatedButton(
+        onPressed: () => oc.takePicture(),
+        child: Icon(Icons.camera),
+      ),
       body: Center(
-        child: OCRKitView(onTextRead: () {}, ocrKitController: oc, onPermissionDenied: () {}),
+        child: OCRKitView(
+            isTakePictureMode: true,
+            onTextRead: (barcode, values, path, orientation) => print(barcode),
+            ocrKitController: oc,
+            onPermissionDenied: () {}),
       ),
     );
   }

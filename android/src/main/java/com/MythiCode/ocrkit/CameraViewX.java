@@ -303,12 +303,12 @@ public class CameraViewX implements CameraViewInterface {
 
                     imageAnalyzer = new ImageAnalysis.Builder()
                             .build();
-                    imageAnalyzer.setAnalyzer(new Executor() {
-                        @Override
-                        public void execute(Runnable command) {
-                            command.run();
-                        }
-                    }, new BarcodeAnalyzer());
+//                    imageAnalyzer.setAnalyzer(new Executor() {
+//                        @Override
+//                        public void execute(Runnable command) {
+//                            command.run();
+//                        }
+//                    }, new BarcodeAnalyzer());
 
 
                     if (userCameraSelector == 0)
@@ -535,25 +535,25 @@ public class CameraViewX implements CameraViewInterface {
                 InputImage image =
                         InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
 
-                textRecognizer.process(image)
-                        .addOnSuccessListener(new OnSuccessListener<Text>() {
-                            @Override
-                            public void onSuccess(Text text) {
-                                processText(text, null);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                flutterMethodListener.onTextRead("Error in reading" + e.getMessage(), null, null);
-                            }
-                        })
-                        .addOnCompleteListener(new OnCompleteListener<Text>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Text> task) {
-                                imageProxy.close();
-                            }
-                        });
+//                textRecognizer.process(image)
+//                        .addOnSuccessListener(new OnSuccessListener<Text>() {
+//                            @Override
+//                            public void onSuccess(Text text) {
+//                                processText(text, null);
+//                            }
+//                        })
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                flutterMethodListener.onTextRead("Error in reading" + e.getMessage(), null, null);
+//                            }
+//                        })
+//                        .addOnCompleteListener(new OnCompleteListener<Text>() {
+//                            @Override
+//                            public void onComplete(@NonNull Task<Text> task) {
+//                                imageProxy.close();
+//                            }
+//                        });
             }
         }
     }
