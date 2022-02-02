@@ -61,12 +61,12 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
         onPressed: () => oc.takePicture(),
-        child: Icon(Icons.camera),
+        child: const Icon(Icons.camera),
       ),
       body: Center(
         child: OCRKitView(
             isTakePictureMode: true,
-            onTextRead: (barcode, values, path, orientation) => print(barcode),
+            onTextRead: (barcode, values, path, orientation) => print("Barcode $barcode"),
             ocrKitController: oc,
             onPermissionDenied: () {}),
       ),

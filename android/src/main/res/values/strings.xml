@@ -1,0 +1,5 @@
+<resources>
+    <string name="no_text">no Text</string>
+    <string name="permission_request">Permission Required</string>
+    <string name="low_storage_error">Low Storage Error</string>
+</resources>

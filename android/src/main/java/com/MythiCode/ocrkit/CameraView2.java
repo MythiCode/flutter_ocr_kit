@@ -1,5 +1,7 @@
 package com.MythiCode.ocrkit;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -42,6 +44,7 @@ import androidx.annotation.RequiresApi;
 
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -55,16 +58,14 @@ import java.util.concurrent.TimeUnit;
 
 import io.flutter.plugin.common.MethodChannel;
 
-import static android.content.ContentValues.TAG;
-
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvailableListener {
 
     private static final int MSG_CAPTURE_PICTURE_WHEN_FOCUS_TIMEOUT = 100;
 
     private int mState = STATE_PREVIEW;
-    private Activity activity;
-    private Semaphore cameraOpenCloseLock = new Semaphore(1);
+    private final Activity activity;
+    private final Semaphore cameraOpenCloseLock = new Semaphore(1);
     private String cameraId;
     private CameraDevice cameraDevice;
     private AutoFitTextureView textureView;
@@ -121,7 +122,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
      */
     private static final int MAX_PREVIEW_HEIGHT = 1080;
 
-    private static SparseIntArray ORIENTATIONS = new SparseIntArray();
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 0);
@@ -131,7 +132,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
     }
 
 
-    private CameraCaptureSession.CaptureCallback captureCallbackBarcodeReader
+    private final CameraCaptureSession.CaptureCallback captureCallbackBarcodeReader
             = new CameraCaptureSession.CaptureCallback() {
 
         @Override
@@ -157,7 +158,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
     };
 
 
-    private CameraCaptureSession.CaptureCallback captureCallbackTakePicture
+    private final CameraCaptureSession.CaptureCallback captureCallbackTakePicture
             = new CameraCaptureSession.CaptureCallback() {
 
         private void process(CaptureResult result) {
@@ -226,7 +227,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
     TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            System.out.println("CameraView Lif Cycle Available " + CameraView2.this.toString());
+            System.out.println("CameraView Lif Cycle Available " + CameraView2.this);
             isDestroy = false;
             if (isCameraVisible) openCamera();
         }
@@ -239,7 +240,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-            System.out.println("CameraView Lif Cycle Destroy " + CameraView2.this.toString());
+            System.out.println("CameraView Lif Cycle Destroy " + CameraView2.this);
             isDestroy = true;
             if (!isCameraVisible) {
                 surface.release();
@@ -279,7 +280,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
             cameraDevice = null;
         }
     };
-    private FlutterMethodListener flutterMethodListener;
+    private final FlutterMethodListener flutterMethodListener;
     private boolean hasBarcodeReader;
     private char previewFlashMode;
     private char currentPreviewFlashMode;
@@ -311,12 +312,12 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
         this.previewFlashMode = flashMode;
 
         if (hasTextReader) {
-            recognizer = TextRecognition.getClient();
+            recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         }
 
         displaySize = new Point();
         activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
-        if (isFillScale == true) //fill
+        if (isFillScale) //fill
             this.relativeLayout.setLayoutParams(new FrameLayout.LayoutParams(
                     displaySize.x,
                     displaySize.y));
@@ -344,7 +345,7 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
                 // We don't use a front facing camera in this sample.
                 Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
                 Boolean available = characteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-                flashSupported = available == null ? false : available;
+                flashSupported = available != null && available;
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
@@ -545,13 +546,13 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
             }
 
             if (recognizer == null && hasBarcodeReader) {
-                recognizer = TextRecognition.getClient();
+                recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
             }
         }
     }
 
     public void pauseCamera() {
-        System.out.println("CameraView Lif Cycle pause: " + this.toString());
+        System.out.println("CameraView Lif Cycle pause: " + this);
 
         closeCamera();
         stopBackgroundThread();

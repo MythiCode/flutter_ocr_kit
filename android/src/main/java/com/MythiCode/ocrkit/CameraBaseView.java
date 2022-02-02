@@ -10,8 +10,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
 public class CameraBaseView implements PlatformView {
-
-
     private final Activity activity;
     private final FlutterMethodListener flutterMethodListener;
     private final RelativeLayout relativeLayout;
@@ -80,7 +78,6 @@ public class CameraBaseView implements PlatformView {
     public void dispose() {
         cameraViewInterface.dispose();
     }
-
 
 
 }

@@ -13,8 +13,8 @@ import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
 
 public class OCRKitFactory extends PlatformViewFactory {
-    private ActivityPluginBinding pluginBinding;
-    private BinaryMessenger binaryMessenger;
+    private final ActivityPluginBinding pluginBinding;
+    private final BinaryMessenger binaryMessenger;
 
     public OCRKitFactory(ActivityPluginBinding pluginBinding, BinaryMessenger binaryMessenger) {
         super(StandardMessageCodec.INSTANCE);

@@ -20,8 +20,6 @@ import io.flutter.plugin.platform.PlatformView;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCallHandler, FlutterMethodListener {
-
-
     private static final int REQUEST_CAMERA_PERMISSION = 10001;
     private final MethodChannel channel;
     private final ActivityPluginBinding activityPluginBinding;
@@ -29,70 +27,83 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
-        if (call.method.equals("requestPermission")) {
-            if (ActivityCompat.checkSelfPermission(activityPluginBinding.getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(activityPluginBinding.getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-                activityPluginBinding.addRequestPermissionsResultListener(new PluginRegistry.RequestPermissionsResultListener() {
-                    @Override
-                    public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-                        for (int i :
-                                grantResults) {
-                            if (i == PackageManager.PERMISSION_DENIED) {
-                                try {
-                                    result.success(false);
-                                }catch (Exception e){
-
+        switch (call.method) {
+            case "requestPermission":
+                if (ActivityCompat.checkSelfPermission(activityPluginBinding.getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(activityPluginBinding.getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                    activityPluginBinding.addRequestPermissionsResultListener(new PluginRegistry.RequestPermissionsResultListener() {
+                        @Override
+                        public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+                            for (int i :
+                                    grantResults) {
+                                if (i == PackageManager.PERMISSION_DENIED) {
+                                    try {
+                                        result.success(false);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                    return false;
                                 }
-                                return false;
                             }
+                            try {
+                                result.success(true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return false;
                         }
-                        try {
-                            result.success(true);
-                        } catch (Exception e) {
-
-                        }
-                        return false;
+                    });
+                    return;
+                } else {
+                    try {
+                        result.success(true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                });
-                return;
-            } else {
-                try {
-                    result.success(true);
-                } catch (Exception e) {
-
                 }
-            }
-        } else if (call.method.equals("initCamera")) {
+                break;
+            case "initCamera":
 //            boolean hasBarcodeReader = call.argument("hasBarcodeReader");
-            char flashMode = call.argument("flashMode").toString().charAt(0);
-            boolean isFillScale = call.argument("isFillScale");
-            boolean isTakePictureMode = call.argument("isTakePictureMode");
-            boolean isScanningText = call.argument("isScanningText");
-            getCameraView().initCamera(true, flashMode, isFillScale, isTakePictureMode, isScanningText);
-        } else if (call.method.equals("resumeCamera")) {
-            getCameraView().resumeCamera();
+                char flashMode = call.argument("flashMode").toString().charAt(0);
+                boolean isFillScale = call.argument("isFillScale");
+                boolean isTakePictureMode = call.argument("isTakePictureMode");
+                boolean isScanningText = call.argument("isScanningText");
+                getCameraView().initCamera(true, flashMode, isFillScale, isTakePictureMode, isScanningText);
+                break;
+            case "resumeCamera":
+                getCameraView().resumeCamera();
 
-        } else if (call.method.equals("pauseCamera")) {
-            getCameraView().pauseCamera();
-        } else if (call.method.equals("takePicture")) {
-            getCameraView().takePicture(result);
-        } else if (call.method.equals("changeFlashMode")) {
-            char captureFlashMode = call.argument("flashMode").toString().charAt(0);
-            getCameraView().changeFlashMode(captureFlashMode);
-        } else if (call.method.equals("dispose")) {
-            dispose();
-        } else if (call.method.equals("setCameraVisible")) {
-            boolean isCameraVisible = call.argument("isCameraVisible");
-            getCameraView().setCameraVisible(isCameraVisible);
-        } else if (call.method.equals("setScanForText")) {
-            boolean isCameraVisible = call.argument("isScanningText");
-            getCameraView().setScanForText(isCameraVisible);
-        } else if (call.method.equals("processImageFromPath")) {
-            String path = call.argument("path");
-            getCameraView().processImageFromPath(path);
-        }
-        else {
-            result.notImplemented();
+                break;
+            case "pauseCamera":
+                getCameraView().pauseCamera();
+                break;
+            case "takePicture":
+                getCameraView().takePicture(result);
+                break;
+            case "changeFlashMode":
+                char captureFlashMode = call.argument("flashMode").toString().charAt(0);
+                getCameraView().changeFlashMode(captureFlashMode);
+                break;
+            case "dispose":
+                dispose();
+                break;
+            case "setCameraVisible": {
+                boolean isCameraVisible = call.argument("isCameraVisible");
+                getCameraView().setCameraVisible(isCameraVisible);
+                break;
+            }
+            case "setScanForText": {
+                boolean isCameraVisible = call.argument("isScanningText");
+                getCameraView().setScanForText(isCameraVisible);
+                break;
+            }
+            case "processImageFromPath":
+                String path = call.argument("path");
+                getCameraView().processImageFromPath(path);
+                break;
+            default:
+                result.notImplemented();
+                break;
         }
     }
 

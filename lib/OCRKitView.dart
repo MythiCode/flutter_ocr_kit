@@ -54,10 +54,9 @@ class OCRKitView extends StatefulWidget {
   }
 }
 
-class _OCRScannerViewState extends State<OCRKitView>
-    with WidgetsBindingObserver {
-   NativeCameraKitController? controller;
-   late VisibilityDetector visibilityDetector;
+class _OCRScannerViewState extends State<OCRKitView> with WidgetsBindingObserver {
+  NativeCameraKitController? controller;
+  late VisibilityDetector visibilityDetector;
 
   @override
   void initState() {
@@ -149,10 +148,7 @@ class NativeCameraKitController {
   Future<dynamic> nativeMethodCallHandler(MethodCall methodCall) async {
     if (methodCall.method == "onTextRead") {
       if (widget.onTextRead != null)
-        widget.onTextRead(
-            methodCall.arguments["barcode"],
-            methodCall.arguments["values"],
-            methodCall.arguments["path"],
+        widget.onTextRead(methodCall.arguments["barcode"], methodCall.arguments["values"], methodCall.arguments["path"],
             methodCall.arguments["orientation"]);
     }
 
@@ -209,8 +205,7 @@ class NativeCameraKitController {
 
   ///Enable and disable scanning for text in live mode.
   Future<void> setScanForText(bool isScanningText) async {
-    return _channel
-        .invokeMethod('setScanForText', {"isScanningText": isScanningText});
+    return _channel.invokeMethod('setScanForText', {"isScanningText": isScanningText});
   }
 
   ///Call resume camera in Native API
@@ -235,8 +230,7 @@ class NativeCameraKitController {
 
   ///Call change flash mode in Native API
   Future<void> changeFlashMode(CameraFlashMode captureFlashMode) {
-    return _channel.invokeMethod(
-        'changeFlashMode', {"flashMode": _getCharFlashMode(captureFlashMode)});
+    return _channel.invokeMethod('changeFlashMode', {"flashMode": _getCharFlashMode(captureFlashMode)});
   }
 
   ///Call dispose in Native API
@@ -247,8 +241,7 @@ class NativeCameraKitController {
   ///Call set camera visible in Native API.
   ///This API is used to automatically manage pause and resume camera
   Future<void> setCameraVisible(bool isCameraVisible) {
-    return _channel
-        .invokeMethod('setCameraVisible', {"isCameraVisible": isCameraVisible});
+    return _channel.invokeMethod('setCameraVisible', {"isCameraVisible": isCameraVisible});
   }
 
   Future<String> processImageFromPath(String path) async {

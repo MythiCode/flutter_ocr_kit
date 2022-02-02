@@ -4,16 +4,8 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.gson.Gson;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognizer;
 
 public class BarcodeDetector {
@@ -30,7 +22,7 @@ public class BarcodeDetector {
             , final Image inputImage, final FlutterMethodListener flutterMethodListener, int firebaseOrientation) {
 
 
-        if(!isBusy) {
+        if (!isBusy) {
             isBusy = true;
 //            textRecognizer
 //                    .process(InputImage.fromMediaImage(inputImage, firebaseOrientation))
