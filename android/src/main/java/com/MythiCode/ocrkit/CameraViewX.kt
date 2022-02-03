@@ -321,13 +321,12 @@ class CameraViewX(
                         recognizer.process(image)
                             .addOnSuccessListener {
                                 // Task completed successfully
-
                                 for (block in it.textBlocks) {
                                     val blockText = block.text
                                     val blockCornerPoints: Array<Point> = block.cornerPoints!!
                                     val blockFrame: Rect = block.boundingBox!!
                                     Log.w(tag, "BlockText $blockText")
-
+                                    processText(it, "")
                                     for (line in block.lines) {
                                         val lineText = line.text
                                         val lineCornerPoints: Array<Point> = line.cornerPoints!!
@@ -412,7 +411,7 @@ class CameraViewX(
     }
 
     private val pictureFile: File
-        private get() = File(activity.cacheDir, "pic.jpg")
+        get() = File(activity.cacheDir, "pic.jpg")
 
     private fun processText(text: Text, path: String) {
         val lineModels: MutableList<LineModel> = ArrayList()

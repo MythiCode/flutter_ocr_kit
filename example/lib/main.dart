@@ -66,7 +66,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: OCRKitView(
             isTakePictureMode: true,
-            onTextRead: (barcode, values, path, orientation) => print("Barcode $barcode"),
+            onTextRead: (barcode, values, path, orientation) {
+              print("Barcode:========================= $barcode");
+              print("Path:============================ $path");
+              print("values:=========================== $values");
+            },
             ocrKitController: oc,
             onPermissionDenied: () {}),
       ),
