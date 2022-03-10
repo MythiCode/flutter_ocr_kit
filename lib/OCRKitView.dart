@@ -182,6 +182,7 @@ class NativeCameraKitController {
     _channel.setMethodCallHandler(nativeMethodCallHandler);
     _channel.invokeMethod('requestPermission').then((value) {
       if (value) {
+        // /sdcard/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg
         if (Platform.isAndroid) {
           _channel.invokeMethod('initCamera', {
             "flashMode": _getCharFlashMode(widget.previewFlashMode),
@@ -189,6 +190,8 @@ class NativeCameraKitController {
             "isTakePictureMode": widget.isTakePictureMode,
             "isScanningText": widget.isScanningText
           });
+          processImageFromPath(
+              "sdcard/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg");
         } else {
           _channel.invokeMethod('initCamera', {
             "flashMode": _getCharFlashMode(widget.previewFlashMode),

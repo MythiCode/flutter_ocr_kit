@@ -19,6 +19,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -34,6 +35,7 @@ import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import dev.ronnie.github.imagepicker.ImagePicker
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.IOException
@@ -42,9 +44,10 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class CameraViewX(
-    private val activity: Activity,
+    private val activity: AppCompatActivity,
     private val flutterMethodListener: FlutterMethodListener
 ) : CameraViewInterface {
     private var imageCapture: ImageCapture? = null
@@ -385,10 +388,59 @@ class CameraViewX(
     }
 
     override fun processImageFromPath(path: String) {
+        Log.e("CameraViewX", "processImageFromPath: $path")
+        val imagePicker = ImagePicker(activity)
+
+        imagePicker.pickFromStorage { imageResult ->
+            Log.e("CameraViewX", "processImageFromPath: $imageResult")
+
+        }
+
         try {
             val inputImage = InputImage.fromFilePath(
                 activity, Uri.fromFile(File(path))
             )
+
+            val mediaImage = inputImage.mediaImage
+            val recognizer: TextRecognizer =
+                TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+            if (mediaImage != null) {
+                val image =
+                    InputImage.fromMediaImage(
+                        mediaImage,
+                        0
+                    )
+                // Pass image to an ML Kit Vision API
+                recognizer.process(image)
+                    .addOnSuccessListener {
+                        // Task completed successfully
+                        for (block in it.textBlocks) {
+                            val blockText = block.text
+                            val blockCornerPoints: Array<Point> = block.cornerPoints!!
+                            val blockFrame: Rect = block.boundingBox!!
+                            Log.w(tag, "BlockText $blockText")
+                            processText(it, "")
+                            for (line in block.lines) {
+                                val lineText = line.text
+                                val lineCornerPoints: Array<Point> = line.cornerPoints!!
+                                val lineFrame: Rect = line.boundingBox!!
+                                Log.w(tag, "LineText $lineText")
+                                for (element in line.elements) {
+                                    val elementText = element.text
+                                    val elementCornerPoints: Array<Point> =
+                                        element.cornerPoints!!
+                                    val elementFrame: Rect = element.boundingBox!!
+                                    Log.d(tag, "ElementText $elementText")
+                                }
+                            }
+                        }
+                    }
+                    .addOnFailureListener {
+                        // Task failed with an exception
+                        Log.e(tag, "Failed to load the image")
+                    }
+            }
+
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -505,4 +557,5 @@ class CameraViewX(
     init {
         Log.e(ContentValues.TAG, "CameraViewX")
     }
+
 }

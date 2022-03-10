@@ -31,6 +31,7 @@ class OCRKitController {
 
   ///Use this method for process image directly with path
   Future<String> processImageFromPath(String path) {
+    print("PATH $path");
     return cameraKitView.viewState.controller!.processImageFromPath(path);
   }
 
