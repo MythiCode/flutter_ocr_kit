@@ -1,22 +1,21 @@
 package com.MythiCode.ocrkit;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.platform.PlatformView;
 
 public class CameraBaseView implements PlatformView {
-    private final AppCompatActivity activity;
+    private final Activity activity;
     private final FlutterMethodListener flutterMethodListener;
     private final RelativeLayout relativeLayout;
     private CameraViewInterface cameraViewInterface;
 
-    public CameraBaseView(AppCompatActivity activity, FlutterMethodListener flutterMethodListener) {
+    public CameraBaseView(Activity activity, FlutterMethodListener flutterMethodListener) {
         this.activity = activity;
         this.flutterMethodListener = flutterMethodListener;
         relativeLayout = new RelativeLayout(activity);
@@ -24,6 +23,7 @@ public class CameraBaseView implements PlatformView {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
         relativeLayout.setBackgroundColor(Color.parseColor("#000000"));
+
     }
 
     public void initCamera(boolean hasTextReader, char flashMode, boolean isFillScale, boolean isTakePictureMode, boolean isScanningText) {

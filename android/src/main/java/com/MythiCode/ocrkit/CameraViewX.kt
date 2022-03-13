@@ -10,7 +10,6 @@ import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.media.ExifInterface
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.util.Size
@@ -19,7 +18,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.core.Camera
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -28,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.MythiCode.ocrkit.Model.CornerPointModel
 import com.MythiCode.ocrkit.Model.LineModel
+import com.MythiCode.ocrkit.Model.ValueModel
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.gson.Gson
 import com.google.mlkit.vision.common.InputImage
@@ -35,7 +34,6 @@ import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import dev.ronnie.github.imagepicker.ImagePicker
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 import java.io.IOException
@@ -47,7 +45,7 @@ import java.util.concurrent.Executors
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class CameraViewX(
-    private val activity: AppCompatActivity,
+    private val activity: Activity,
     private val flutterMethodListener: FlutterMethodListener
 ) : CameraViewInterface {
     private var imageCapture: ImageCapture? = null
@@ -361,17 +359,6 @@ class CameraViewX(
 
     }
 
-    private val imageAnalyzer by lazy {
-        ImageAnalysis.Builder()
-            .setTargetAspectRatio(AspectRatio.RATIO_16_9)
-            .build()
-            .also {
-                it.setAnalyzer(
-                    cameraExecutor,
-                    TextReaderAnalyzer()
-                )
-            }
-    }
 
     override fun pauseCamera() {}
 
@@ -388,58 +375,61 @@ class CameraViewX(
     }
 
     override fun processImageFromPath(path: String) {
-        Log.e("CameraViewX", "processImageFromPath: $path")
-        val imagePicker = ImagePicker(activity)
-
-        imagePicker.pickFromStorage { imageResult ->
-            Log.e("CameraViewX", "processImageFromPath: $imageResult")
-
-        }
 
         try {
-            val inputImage = InputImage.fromFilePath(
-                activity, Uri.fromFile(File(path))
+            val bitmap = BitmapFactory.decodeFile(path)
+            val exif: ExifInterface = ExifInterface(path)
+            val rotation = exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
             )
+            val inputImage = InputImage.fromBitmap(bitmap, rotation)
 
-            val mediaImage = inputImage.mediaImage
+
             val recognizer: TextRecognizer =
                 TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-            if (mediaImage != null) {
-                val image =
-                    InputImage.fromMediaImage(
-                        mediaImage,
-                        0
-                    )
-                // Pass image to an ML Kit Vision API
-                recognizer.process(image)
-                    .addOnSuccessListener {
-                        // Task completed successfully
-                        for (block in it.textBlocks) {
-                            val blockText = block.text
-                            val blockCornerPoints: Array<Point> = block.cornerPoints!!
-                            val blockFrame: Rect = block.boundingBox!!
-                            Log.w(tag, "BlockText $blockText")
-                            processText(it, "")
-                            for (line in block.lines) {
-                                val lineText = line.text
-                                val lineCornerPoints: Array<Point> = line.cornerPoints!!
-                                val lineFrame: Rect = line.boundingBox!!
-                                Log.w(tag, "LineText $lineText")
-                                for (element in line.elements) {
-                                    val elementText = element.text
-                                    val elementCornerPoints: Array<Point> =
-                                        element.cornerPoints!!
-                                    val elementFrame: Rect = element.boundingBox!!
-                                    Log.d(tag, "ElementText $elementText")
-                                }
+            recognizer.process(inputImage)
+                .addOnSuccessListener {
+                    // Task completed successfully
+
+                    val map: MutableMap<String, String> = mutableMapOf()
+                    val value: MutableMap<String, ValueModel> = mutableMapOf()
+                    // Log.w(tag, "Text ${it.text}")
+                    map["text"] = it.text
+                    map["path"] = path
+                    map["orientation"] = "$rotation"
+
+                    for (block in it.textBlocks) {
+
+                        val blockText = block.text
+                        val blockCornerPoints: Array<Point> = block.cornerPoints!!
+                        val blockFrame: Rect = block.boundingBox!!
+                        // Log.w(tag, "BlockText $blockText")
+                        processText(it, "")
+                        for (line in block.lines) {
+                            val lineText = line.text
+                            val lineCornerPoints: Array<Point> = line.cornerPoints!!
+                            val lineFrame: Rect = line.boundingBox!!
+                            //  Log.w(tag, "LineText $lineText")
+                            for (element in line.elements) {
+                                val elementText = element.text
+                                val elementCornerPoints: Array<Point> =
+                                    element.cornerPoints!!
+                                val elementFrame: Rect = element.boundingBox!!
+                                //  Log.d(tag, "ElementText $elementText")
+                                val valueModel = ValueModel(elementText, elementCornerPoints)
+                                value[""] = valueModel
+                                map["values"] = valueModel.toString()
+
                             }
                         }
                     }
-                    .addOnFailureListener {
-                        // Task failed with an exception
-                        Log.e(tag, "Failed to load the image")
-                    }
-            }
+                    Log.d(tag, "Map $map")
+                }
+                .addOnFailureListener {
+                    // Task failed with an exception
+                    Log.e(tag, "Failed to load the image $it")
+                }
 
         } catch (e: IOException) {
             e.printStackTrace()
