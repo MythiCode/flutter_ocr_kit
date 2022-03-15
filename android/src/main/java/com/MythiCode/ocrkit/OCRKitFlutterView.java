@@ -30,7 +30,10 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         switch (call.method) {
             case "requestPermission":
                 if (ActivityCompat.checkSelfPermission(activityPluginBinding.getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(activityPluginBinding.getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                    ActivityCompat.requestPermissions(activityPluginBinding.getActivity(), new String[]{
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CAMERA_PERMISSION);
                     activityPluginBinding.addRequestPermissionsResultListener(new PluginRegistry.RequestPermissionsResultListener() {
                         @Override
                         public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {

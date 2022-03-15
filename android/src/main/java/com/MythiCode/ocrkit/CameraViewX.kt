@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 class CameraViewX(
     private val activity: Activity,
@@ -298,9 +297,9 @@ class CameraViewX(
     private val tag = "ANALYZER"
 
     override fun takePicture(result: MethodChannel.Result) {
-
         // Set up image capture listener, which is triggered after photo has
         // been taken
+        Log.e(tag, "takePicture $result")
 
         imageCapture!!.takePicture(
             ContextCompat.getMainExecutor(activity),
@@ -348,17 +347,18 @@ class CameraViewX(
                                 Log.e(tag, "Failed to load the image")
                             }
                     }
-
                     imageProxy.close()
                 }
 
+
                 override fun onError(exception: ImageCaptureException) {
-                    Log.e(tag, "Error to load the image $exception")
+                    Log.e(tag, "Error to load the image1 ${exception.imageCaptureError}")
+                    Log.e(tag, "Error to load the image2 ${exception.message}")
+                    Log.e(tag, "Error to load the image3 ${exception.cause}")
                 }
             })
 
     }
-
 
     override fun pauseCamera() {}
 
@@ -375,16 +375,14 @@ class CameraViewX(
     }
 
     override fun processImageFromPath(path: String) {
-
         try {
             val bitmap = BitmapFactory.decodeFile(path)
-            val exif: ExifInterface = ExifInterface(path)
+            val exif = ExifInterface(path)
             val rotation = exif.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_NORMAL
             )
-            val inputImage = InputImage.fromBitmap(bitmap, rotation)
-
+            val inputImage = InputImage.fromBitmap(bitmap, 0)
 
             val recognizer: TextRecognizer =
                 TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
@@ -393,46 +391,41 @@ class CameraViewX(
                     // Task completed successfully
 
                     val map: MutableMap<String, String> = mutableMapOf()
-                    val value: MutableMap<String, ValueModel> = mutableMapOf()
-                    // Log.w(tag, "Text ${it.text}")
+                    val listPoints: ArrayList<MutableMap<String, String>> = ArrayList()
+
                     map["text"] = it.text
                     map["path"] = path
                     map["orientation"] = "$rotation"
 
                     for (block in it.textBlocks) {
 
-                        val blockText = block.text
-                        val blockCornerPoints: Array<Point> = block.cornerPoints!!
-                        val blockFrame: Rect = block.boundingBox!!
-                        // Log.w(tag, "BlockText $blockText")
                         processText(it, "")
                         for (line in block.lines) {
-                            val lineText = line.text
-                            val lineCornerPoints: Array<Point> = line.cornerPoints!!
-                            val lineFrame: Rect = line.boundingBox!!
-                            //  Log.w(tag, "LineText $lineText")
                             for (element in line.elements) {
+                                val value: MutableMap<String, String> = mutableMapOf()
                                 val elementText = element.text
                                 val elementCornerPoints: Array<Point> =
                                     element.cornerPoints!!
-                                val elementFrame: Rect = element.boundingBox!!
-                                //  Log.d(tag, "ElementText $elementText")
-                                val valueModel = ValueModel(elementText, elementCornerPoints)
-                                value[""] = valueModel
-                                map["values"] = valueModel.toString()
-
+                                value["text"] = elementText
+                                value["cornerPoints"] = elementCornerPoints.toString()
+                                listPoints.add(value)
                             }
                         }
+
                     }
+                    map["values"] = listPoints.toString()
+
                     Log.d(tag, "Map $map")
                 }
                 .addOnFailureListener {
                     // Task failed with an exception
-                    Log.e(tag, "Failed to load the image $it")
+                    Log.e(tag, "Failed to load the image ${it.cause}")
+                    Log.e(tag, "Failed to load the image ${it.message}")
                 }
 
         } catch (e: IOException) {
             e.printStackTrace()
+            Log.e(tag, "Error to load the image From Path: $e")
         }
     }
 

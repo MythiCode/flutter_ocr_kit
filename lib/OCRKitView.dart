@@ -183,14 +183,19 @@ class NativeCameraKitController {
     _channel.invokeMethod('requestPermission').then((value) {
       if (value) {
         if (Platform.isAndroid) {
+
           _channel.invokeMethod('initCamera', {
             "flashMode": _getCharFlashMode(widget.previewFlashMode),
             "isFillScale": _getScaleTypeMode(widget.scaleType),
             "isTakePictureMode": widget.isTakePictureMode,
             "isScanningText": widget.isScanningText
           });
-          processImageFromPath(
-              "/storage/emulated/0/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg");
+          _channel.invokeMethod('processImageFromPath', {
+            "path":"/storage/emulated/0/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg",
+          });
+          // processImageFromPath(
+          //     "/storage/emulated/0/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg");
+
         } else {
           _channel.invokeMethod('initCamera', {
             "flashMode": _getCharFlashMode(widget.previewFlashMode),
