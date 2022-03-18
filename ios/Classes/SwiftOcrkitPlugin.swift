@@ -42,7 +42,7 @@ public class SwiftOcrkitPlugin: NSObject, FlutterPlugin {
                             var values : String = ""
                             for b in text.blocks {
                                 for l in b.lines{
-                                    var lineModel : LineModel = LineModel()
+                                    var lineModel : LineModel = LineModel(text: "", cp: [])
                                     lineModel.text = l.text
                                     for c in l.cornerPoints {
                                         lineModel.cornerPoints
@@ -148,7 +148,7 @@ public class SwiftOcrkitPlugin: NSObject, FlutterPlugin {
 
                         for b in result.blocks {
                             for l in b.lines{
-                                var lineModel : LineModel = LineModel()
+                                var lineModel : LineModel = LineModel(text: "", cp: [])
                                 lineModel.text = l.text
 
 
