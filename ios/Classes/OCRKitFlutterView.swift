@@ -232,12 +232,12 @@ class OCRKitFlutterView : NSObject, FlutterPlatformView, AVCaptureVideoDataOutpu
 
             if(hasBarcodeReader) {
                 videoDataOutput = AVCaptureVideoDataOutput()
-                videoDataOutput.alwaysDiscardsLateVideoFrames=true
+                videoDataOutput.alwaysDiscardsLateVideoFrames = true
                
                 videoDataOutputQueue = DispatchQueue(label: "VideoDataOutputQueue")
                 videoDataOutput.setSampleBufferDelegate(self, queue:self.videoDataOutputQueue)
                 if session.canAddOutput(videoDataOutput!){
-                             session.addOutput(videoDataOutput!)
+                             session.addOutput(videoDataOutput)
                  }
                 videoDataOutput.connection(with: .video)?.isEnabled = true
 
@@ -453,7 +453,7 @@ class OCRKitFlutterView : NSObject, FlutterPlatformView, AVCaptureVideoDataOutpu
                         
                         for b in result.blocks {
                             for l in b.lines{
-                                var lineModel : LineModel = LineModel()
+                                var lineModel = LineModel(text: "", cp: [])
                                 lineModel.text = l.text
                                 
                             
@@ -499,9 +499,37 @@ class OCRKitFlutterView : NSObject, FlutterPlatformView, AVCaptureVideoDataOutpu
         if(self.isScanningText) {
             let visionImage = VisionImage(buffer: sampleBuffer)
             visionImage.orientation = orientation
-            proccessImage(visionImage: visionImage)
+            var listLineModel: [LineModel] = []
+            var values = ""
+
+            do {
+                var results = try textRecognizer?.results(in: visionImage)
+                
+                for block in results!.blocks {
+                    for line in block.lines {
+                        var cp = [CornerPointModel]()
+                        for c in line.cornerPoints {
+                            cp.append(CornerPointModel(x: c.cgPointValue.x, y: c.cgPointValue.y))
+                        }
+
+                        listLineModel.append(LineModel(text: line.text, cp: cp))
+
+                    }
+                }
+                
+                do{
+                    let jsonData =  try JSONEncoder().encode(listLineModel)
+                    values = String(data: jsonData, encoding: String.Encoding.utf8)!
+                    }catch{
+                         fatalError("Unable To Convert in Json")
+                    }
+                
+                self.textRead(barcode: results!.text, values: values, path: nil, orientation:  visionImage.orientation.rawValue)
+
+            } catch {
+                print("can't fetch result")
+            }
         }
-        
     }
     
     func textRead(barcode: String, values: String?, path: String?, orientation: Int?) {
@@ -516,9 +544,15 @@ class OCRKitFlutterView : NSObject, FlutterPlatformView, AVCaptureVideoDataOutpu
     
     
 }
+
 class LineModel: Codable {
     var text:String = ""
     var cornerPoints : [CornerPointModel] = []
+    
+    init(text: String, cp: [CornerPointModel]) {
+        self.text = text
+        self.cornerPoints = cp
+    }
 }
 
 
