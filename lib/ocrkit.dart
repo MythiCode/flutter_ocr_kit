@@ -9,4 +9,11 @@ class Ocrkit {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
+
+  static Future<String?> get processImageFromPathWithoutView async {
+    final String? version = await _channel.invokeMethod('processImageFromPathWithoutView');
+    return version;
+  }
+
+
 }

@@ -16,11 +16,9 @@ import io.flutter.plugin.common.MethodChannel;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class TakePictureImageListener implements ImageReader.OnImageAvailableListener {
-
-
-    private FlutterMethodListener flutterMethodListener;
-    private MethodChannel.Result resultMethodChannel;
-    private File file;
+    private final FlutterMethodListener flutterMethodListener;
+    private final MethodChannel.Result resultMethodChannel;
+    private final File file;
 
     public TakePictureImageListener(FlutterMethodListener flutterMethodListener, MethodChannel.Result resultMethodChannel, File file) {
         this.flutterMethodListener = flutterMethodListener;

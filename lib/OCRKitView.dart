@@ -190,11 +190,6 @@ class NativeCameraKitController {
             "isTakePictureMode": widget.isTakePictureMode,
             "isScanningText": widget.isScanningText
           });
-          _channel.invokeMethod('processImageFromPath', {
-            "path":"/storage/emulated/0/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg",
-          });
-          // processImageFromPath(
-          //     "/storage/emulated/0/DCIM/inspiration-unlimited-iu-e-magazine-inspiring-quotes-motivation-continuous-learning-faith-leadership-discovery-success.jpg");
 
         } else {
           _channel.invokeMethod('initCamera', {
@@ -253,5 +248,9 @@ class NativeCameraKitController {
 
   Future<String> processImageFromPath(String path) async {
     return "${_channel.invokeMethod('processImageFromPath', {"path": path})}";
+  }
+
+  Future<String> processImageFromPathWithoutView(String path) async {
+    return "${_channel.invokeMethod('processImageFromPathWithoutView', {"path": path})}";
   }
 }

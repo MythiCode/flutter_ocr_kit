@@ -835,6 +835,11 @@ public class CameraView2 implements CameraViewInterface, ImageReader.OnImageAvai
 
     }
 
+    @Override
+    public void processImageFromPathWithoutView(String path) {
+
+    }
+
     private static byte[] convertImageToByte(Image image) {
         byte[] nv21;
         ByteBuffer yBuffer = image.getPlanes()[0].getBuffer();

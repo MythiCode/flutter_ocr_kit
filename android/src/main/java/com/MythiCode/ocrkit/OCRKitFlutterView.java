@@ -3,6 +3,7 @@ package com.MythiCode.ocrkit;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
+        Log.e("OCRKitFlutterView", "onMethodCall:" + call.method);
         switch (call.method) {
             case "requestPermission":
                 if (ActivityCompat.checkSelfPermission(activityPluginBinding.getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -95,6 +97,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
                 getCameraView().setCameraVisible(isCameraVisible);
                 break;
             }
+
             case "setScanForText": {
                 boolean isCameraVisible = call.argument("isScanningText");
                 getCameraView().setScanForText(isCameraVisible);
@@ -103,6 +106,11 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
             case "processImageFromPath":
                 String path = call.argument("path");
                 getCameraView().processImageFromPath(path);
+                break;
+
+            case "processImageFromPathWithoutView":
+                String path1 = call.argument("path");
+                getCameraView().processImageFromPathWithoutView(path1);
                 break;
             default:
                 result.notImplemented();

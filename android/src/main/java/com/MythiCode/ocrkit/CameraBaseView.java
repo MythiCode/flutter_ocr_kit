@@ -23,7 +23,6 @@ public class CameraBaseView implements PlatformView {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT));
         relativeLayout.setBackgroundColor(Color.parseColor("#000000"));
-
     }
 
     public void initCamera(boolean hasTextReader, char flashMode, boolean isFillScale, boolean isTakePictureMode, boolean isScanningText) {
@@ -57,6 +56,10 @@ public class CameraBaseView implements PlatformView {
         cameraViewInterface.processImageFromPath(path);
     }
 
+    public void processImageFromPathWithoutView(String path) {
+        cameraViewInterface.processImageFromPathWithoutView(path);
+    }
+
     public void takePicture(final MethodChannel.Result result) {
         cameraViewInterface.takePicture(result);
     }
@@ -78,6 +81,5 @@ public class CameraBaseView implements PlatformView {
     public void dispose() {
         cameraViewInterface.dispose();
     }
-
 
 }

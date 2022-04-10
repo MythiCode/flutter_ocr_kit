@@ -60,7 +60,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
-        onPressed: () => oc.takePicture(),
+        onPressed: () {
+         oc.takePicture();
+        },
         child: const Icon(Icons.camera),
       ),
       body: Center(

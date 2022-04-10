@@ -26,7 +26,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.MythiCode.ocrkit.Model.CornerPointModel
 import com.MythiCode.ocrkit.Model.LineModel
-import com.MythiCode.ocrkit.Model.ValueModel
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.gson.Gson
 import com.google.mlkit.vision.common.InputImage
@@ -337,7 +336,13 @@ class CameraViewX(
                                             val elementCornerPoints: Array<Point> =
                                                 element.cornerPoints!!
                                             val elementFrame: Rect = element.boundingBox!!
-                                            Log.d(tag, "ElementText $elementText")
+                                            // Log.d(tag, "ElementText $elementText")
+                                            for (el in elementCornerPoints) {
+                                                Log.d(
+                                                    tag,
+                                                    "elementText $elementText  cornerPoints : X:${el.x} Y:${el.y}"
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -375,6 +380,7 @@ class CameraViewX(
     }
 
     override fun processImageFromPath(path: String) {
+        Log.d(tag, "processImageFromPath")
         try {
             val bitmap = BitmapFactory.decodeFile(path)
             val exif = ExifInterface(path)
@@ -408,6 +414,7 @@ class CameraViewX(
                                     element.cornerPoints!!
                                 value["text"] = elementText
                                 value["cornerPoints"] = elementCornerPoints.toString()
+
                                 listPoints.add(value)
                             }
                         }
@@ -415,7 +422,60 @@ class CameraViewX(
                     }
                     map["values"] = listPoints.toString()
 
-                    Log.d(tag, "Map $map")
+                  //  Log.d(tag, "Map $map")
+                }
+                .addOnFailureListener {
+                    // Task failed with an exception
+                    Log.e(tag, "Failed to load the image ${it.cause}")
+                    Log.e(tag, "Failed to load the image ${it.message}")
+                }
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Log.e(tag, "Error to load the image From Path: $e")
+        }
+    }
+
+    override fun processImageFromPathWithoutView(path: String) {
+        Log.d(tag, "processImageFromPathWithoutView")
+        try {
+            val bitmap = BitmapFactory.decodeFile(path)
+            val inputImage = InputImage.fromBitmap(bitmap, 0)
+
+            val recognizer: TextRecognizer =
+                TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+            recognizer.process(inputImage)
+                .addOnSuccessListener {
+                    // Task completed successfully
+                    Log.d(tag, "IT ${it.text}")
+
+                    val map: MutableMap<String, String> = mutableMapOf()
+                    val listPoints: ArrayList<MutableMap<String, String>> = ArrayList()
+
+                    map["text"] = it.text
+                    map["path"] = path
+                    map["orientation"] = "0"
+
+                    for (block in it.textBlocks) {
+
+                        processText(it, "")
+                        for (line in block.lines) {
+                            for (element in line.elements) {
+                                val value: MutableMap<String, String> = mutableMapOf()
+                                val elementText = element.text
+                                val elementCornerPoints: Array<Point> =
+                                    element.cornerPoints!!
+                                value["text"] = elementText
+                                value["cornerPoints"] = elementCornerPoints.toString()
+                                listPoints.add(value)
+                            }
+                        }
+
+                    }
+                    map["values"] = listPoints.toString()
+
+                    Log.d(tag, "MAP $map")
                 }
                 .addOnFailureListener {
                     // Task failed with an exception

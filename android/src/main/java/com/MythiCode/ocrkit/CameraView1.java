@@ -248,6 +248,11 @@ public class CameraView1 implements SurfaceHolder.Callback, CameraViewInterface 
 
     }
 
+    @Override
+    public void processImageFromPathWithoutView(String path) {
+
+    }
+
     public void pauseCamera() {
         releaseCamera();
         mCamera = null;

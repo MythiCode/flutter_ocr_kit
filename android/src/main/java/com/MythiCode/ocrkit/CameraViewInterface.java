@@ -24,4 +24,6 @@ public interface CameraViewInterface {
     void setScanForText(boolean isScanningText);
 
     void processImageFromPath(String path);
+
+    void processImageFromPathWithoutView(String path);
 }

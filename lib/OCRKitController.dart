@@ -31,16 +31,15 @@ class OCRKitController {
 
   ///Use this method for process image directly with path
   Future<String> processImageFromPath(String path) {
-    print("PATH $path");
     return cameraKitView.viewState.controller!.processImageFromPath(path);
   }
 
   ///Use this method for process image directly with path without need ViewState
   Future<dynamic> processImageFromPathWithoutView(String path) async {
     if (_channel == null) {
-      _channel = new MethodChannel('plugins/ocrkit');
+      _channel = new MethodChannel('plugins/ocr_kit_0');
     }
-    return _channel?.invokeMethod('processImageFromPath', {"path": path});
+    return _channel?.invokeMethod('processImageFromPathWithoutView', {"path": path});
   }
 
   ///Change flash mode between auto, on and off
