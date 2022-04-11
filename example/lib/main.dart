@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:camerakit/CameraKitController.dart';
+import 'package:camerakit/CameraKitView.dart';
 import 'package:flutter/material.dart';
 import 'package:ocrkit/OCRKitController.dart';
 import 'package:ocrkit/OCRKitView.dart';
@@ -50,7 +54,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  OCRKitController oc = OCRKitController();
+  // OCRKitController oc = OCRKitController();
+  CameraKitController cc = CameraKitController();
+
+  takePicture() async {
+    // oc.takePicture();
+    String? path = await cc.takePicture();
+    final result = await OCRKitController().processImageFromPathWithoutView(path!);
+    Map<String, dynamic> data = jsonDecode(result);
+    print(data);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,22 +73,23 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: ElevatedButton(
-        onPressed: () {
-         oc.takePicture();
-        },
+        onPressed: () => takePicture(),
         child: const Icon(Icons.camera),
       ),
       body: Center(
-        child: OCRKitView(
-            isTakePictureMode: true,
-            onTextRead: (barcode, values, path, orientation) {
-              print("Barcode:========================= $barcode");
-              print("Path:============================ $path");
-              print("values:=========================== $values");
-            },
-            ocrKitController: oc,
-            onPermissionDenied: () {}),
+        child: CameraKitView(cameraKitController: cc),
       ),
+      // body: Center(
+      //   child: OCRKitView(
+      //       isTakePictureMode: true,
+      //       onTextRead: (barcode, values, path, orientation) {
+      //         print("Barcode:========================= $barcode");
+      //         print("Path:============================ $path");
+      //         print("values:=========================== $values");
+      //       },
+      //       ocrKitController: oc,
+      //       onPermissionDenied: () {}),
+      // ),
     );
   }
 }
