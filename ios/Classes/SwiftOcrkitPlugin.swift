@@ -5,15 +5,15 @@ import MLKitVision
 
 public class SwiftOcrkitPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "plugins/ocrkit", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: "plugins/ocr_kit_0", binaryMessenger: registrar.messenger())
         let instance = SwiftOcrkitPlugin()
 
-        registrar.register(OCRKitFactory(registrar: registrar), withId: "plugins/ocr_kit")
+        registrar.register(OCRKitFactory(registrar: registrar), withId: "plugins/ocr_kit_0")
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        if call.method == "processImageFromPath" {
+        if call.method == "processImageFromPathWithoutView" {
             let args = call.arguments
             let myArgs = args as? [String: Any]
             let path = (myArgs?["path"] ) as! String
