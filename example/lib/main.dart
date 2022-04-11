@@ -4,7 +4,6 @@ import 'package:camerakit/CameraKitController.dart';
 import 'package:camerakit/CameraKitView.dart';
 import 'package:flutter/material.dart';
 import 'package:ocrkit/OCRKitController.dart';
-import 'package:ocrkit/OCRKitView.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,27 +54,33 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   // OCRKitController oc = OCRKitController();
-  CameraKitController cc = CameraKitController();
+  CameraKitController? cc;
+
+  @override
+  void initState() {
+    super.initState();
+    cc = CameraKitController();
+    print("CameraKitController" + cc.toString());
+  }
 
   takePicture() async {
     // oc.takePicture();
-    String? path = await cc.takePicture();
-    final result = await OCRKitController().processImageFromPathWithoutView(path!);
-    Map<String, dynamic> data = jsonDecode(result);
-    print(data);
+    try {
+      String? path = await cc!.takePicture();
+      final result = await OCRKitController().processImageFromPathWithoutView(path!);
+      Map<String, dynamic> data = jsonDecode(result);
+      print(data);
+    } catch (e) {
+      print("Exeption $e");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: ElevatedButton(
-        onPressed: () => takePicture(),
-        child: const Icon(Icons.camera),
-      ),
+      floatingActionButton: ElevatedButton(onPressed: () => takePicture(), child: const Icon(Icons.camera)),
       body: Center(
         child: CameraKitView(cameraKitController: cc),
       ),

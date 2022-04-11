@@ -209,8 +209,8 @@ class CameraViewX(
                         )
                     )
                     .build()
-                preview!!.setSurfaceProvider(previewView!!.surfaceProvider)
-
+                //preview!!.setSurfaceProvider(previewView!!.surfaceProvider)
+                preview!!.setSurfaceProvider(previewView!!.createSurfaceProvider())
 
                 imageCapture = ImageCapture.Builder()
                     .setFlashMode(flashMode)
@@ -422,7 +422,7 @@ class CameraViewX(
                     }
                     map["values"] = listPoints.toString()
 
-                  //  Log.d(tag, "Map $map")
+                    //  Log.d(tag, "Map $map")
                 }
                 .addOnFailureListener {
                     // Task failed with an exception

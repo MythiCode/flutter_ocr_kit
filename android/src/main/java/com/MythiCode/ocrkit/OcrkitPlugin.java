@@ -1,5 +1,7 @@
 package com.MythiCode.ocrkit;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -20,6 +22,7 @@ public class OcrkitPlugin implements FlutterPlugin, MethodCallHandler, ActivityA
     /// when the Flutter Engine is detached from the Activity
     private BinaryMessenger binaryMessenger;
     private PlatformViewRegistry registery;
+    final String viewType = "<platform-view-type>";
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
@@ -38,12 +41,11 @@ public class OcrkitPlugin implements FlutterPlugin, MethodCallHandler, ActivityA
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        Log.e("CHANNEL", "onAttachedToActivity " + binding);
         System.out.println("onAttachedToActivity");
         binding.getActivity();
-        registery
-                .registerViewFactory(
-                        "plugins/ocr_kit"
-                        , new OCRKitFactory(binding, binaryMessenger));
+        registery.registerViewFactory(viewType, new OCRKitFactory(binding, binaryMessenger));
+        Log.e("CHANNEL", "onAttachedToActivity " + registery.toString());
     }
 
     @Override

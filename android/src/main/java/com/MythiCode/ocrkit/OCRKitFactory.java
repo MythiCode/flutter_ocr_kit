@@ -22,6 +22,7 @@ public class OCRKitFactory extends PlatformViewFactory {
 
         this.pluginBinding = pluginBinding;
         this.binaryMessenger = binaryMessenger;
+        new OCRKitFlutterView(pluginBinding, binaryMessenger, 0);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

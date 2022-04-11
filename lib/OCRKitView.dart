@@ -57,6 +57,7 @@ class OCRKitView extends StatefulWidget {
 class _OCRScannerViewState extends State<OCRKitView> with WidgetsBindingObserver {
   NativeCameraKitController? controller;
   late VisibilityDetector visibilityDetector;
+  final String viewType = '<platform-view-type>';
 
   @override
   void initState() {
@@ -73,10 +74,7 @@ class _OCRScannerViewState extends State<OCRKitView> with WidgetsBindingObserver
                 controller!.setCameraVisible(true);
             }
           },
-          child: AndroidView(
-            viewType: 'plugins/ocr_kit',
-            onPlatformViewCreated: _onPlatformViewCreated,
-          ));
+          child: AndroidView(viewType: viewType, onPlatformViewCreated: _onPlatformViewCreated));
     } else {
       visibilityDetector = VisibilityDetector(
           key: Key('visible-camerakit-key-1'),
@@ -86,10 +84,7 @@ class _OCRScannerViewState extends State<OCRKitView> with WidgetsBindingObserver
             else
               controller!.setCameraVisible(true);
           },
-          child: UiKitView(
-            viewType: 'plugins/ocr_kit',
-            onPlatformViewCreated: _onPlatformViewCreated,
-          ));
+          child: UiKitView(viewType: 'plugins/ocr_kit', onPlatformViewCreated: _onPlatformViewCreated));
     }
   }
 
@@ -127,6 +122,7 @@ class _OCRScannerViewState extends State<OCRKitView> with WidgetsBindingObserver
   }
 
   void _onPlatformViewCreated(int id) {
+    print("_onPlatformViewCreated $id");
     this.controller = new NativeCameraKitController._(id, context, widget);
     this.controller!.initCamera();
   }
@@ -141,26 +137,20 @@ class NativeCameraKitController {
   OCRKitView widget;
 
   NativeCameraKitController._(int id, this.context, this.widget)
-      : _channel = new MethodChannel('plugins/ocr_kit_' + id.toString());
+      : _channel = new MethodChannel('plugins/ocrkit' + id.toString());
 
   final MethodChannel _channel;
 
   Future<dynamic> nativeMethodCallHandler(MethodCall methodCall) async {
     if (methodCall.method == "onTextRead") {
-      if (widget.onTextRead != null)
-        widget.onTextRead(methodCall.arguments["barcode"], methodCall.arguments["values"], methodCall.arguments["path"],
-            methodCall.arguments["orientation"]);
+      widget.onTextRead(methodCall.arguments["barcode"], methodCall.arguments["values"], methodCall.arguments["path"],
+          methodCall.arguments["orientation"]);
     }
 
     return null;
   }
 
-  bool _getScaleTypeMode(ScaleTypeMode scaleType) {
-    if (scaleType == ScaleTypeMode.fill)
-      return true;
-    else
-      return false;
-  }
+  bool _getScaleTypeMode(ScaleTypeMode scaleType) => scaleType == ScaleTypeMode.fill ? true : false;
 
   String? _getCharFlashMode(CameraFlashMode cameraFlashMode) {
     String? flashMode;
@@ -183,14 +173,12 @@ class NativeCameraKitController {
     _channel.invokeMethod('requestPermission').then((value) {
       if (value) {
         if (Platform.isAndroid) {
-
           _channel.invokeMethod('initCamera', {
             "flashMode": _getCharFlashMode(widget.previewFlashMode),
             "isFillScale": _getScaleTypeMode(widget.scaleType),
             "isTakePictureMode": widget.isTakePictureMode,
             "isScanningText": widget.isScanningText
           });
-
         } else {
           _channel.invokeMethod('initCamera', {
             "flashMode": _getCharFlashMode(widget.previewFlashMode),
@@ -248,9 +236,5 @@ class NativeCameraKitController {
 
   Future<String> processImageFromPath(String path) async {
     return "${_channel.invokeMethod('processImageFromPath', {"path": path})}";
-  }
-
-  Future<String> processImageFromPathWithoutView(String path) async {
-    return "${_channel.invokeMethod('processImageFromPathWithoutView', {"path": path})}";
   }
 }

@@ -2,6 +2,10 @@ package com.MythiCode.ocrkit;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.media.ExifInterface;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -10,7 +14,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
+import com.MythiCode.ocrkit.Model.CornerPointModel;
+import com.MythiCode.ocrkit.Model.LineModel;
+import com.google.android.gms.tasks.OnCanceledListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.Gson;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -25,6 +44,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     private final MethodChannel channel;
     private final ActivityPluginBinding activityPluginBinding;
     private CameraBaseView cameraView;
+    FlutterMethodListener flutterMethodListener;
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
@@ -110,7 +130,11 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
             case "processImageFromPathWithoutView":
                 String path1 = call.argument("path");
-                getCameraView().processImageFromPathWithoutView(path1);
+                try {
+                    processImageFromPathWithoutView(path1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             default:
                 result.notImplemented();
@@ -123,7 +147,8 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     }
 
     public OCRKitFlutterView(ActivityPluginBinding activityPluginBinding, BinaryMessenger binaryMessenger, int viewId) {
-        this.channel = new MethodChannel(binaryMessenger, "plugins/ocr_kit_" + viewId);
+        this.channel = new MethodChannel(binaryMessenger, "plugins/ocrkit");
+        Log.e("CHANNEL", "plugins/ocrkit" + viewId);
         this.activityPluginBinding = activityPluginBinding;
         this.channel.setMethodCallHandler(this);
         if (getCameraView() == null) {
@@ -162,6 +187,27 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         });
     }
 
+    private void processText(Text text, String path) {
+        Log.d("OCRKitFlutterView", "processText" + text.getText());
+        ArrayList<LineModel> lineModels = new ArrayList<>();
+        for (int i = 0; i < text.getTextBlocks().size(); i++) {
+            for (int j = 0; j < text.getTextBlocks().get(i).getLines().size(); j++) {
+                Text.Line line = text.getTextBlocks().get(i).getLines().get(j);
+                LineModel lineModel = new LineModel(line.getText());
+                for (int k = 0; k < Objects.requireNonNull(line.getCornerPoints()).length; k++) {
+                    Point point = line.getCornerPoints()[k];
+                    lineModel.cornerPoints.add(new CornerPointModel(point.x, point.y));
+                }
+                lineModels.add(lineModel);
+            }
+        }
+        Gson gson = new Gson();
+        gson.toJson(lineModels);
+        onTextRead(text.getText(), new Gson().toJson(lineModels), path);
+        Log.d("OCRKitFlutterView", "lineModels" + lineModels);
+    }
+
+
     @Override
     public void onTakePictureFailed(final MethodChannel.Result result, final String errorCode, final String errorMessage) {
         activityPluginBinding.getActivity().runOnUiThread(new Runnable() {
@@ -171,4 +217,52 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
             }
         });
     }
+
+    private void processImageFromPathWithoutView(final String path) throws IOException {
+        Log.d("OCRKitFlutterView", "processImageFromPathWithoutView" + path);
+
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+
+        TextRecognizer recognizer =
+                TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+
+        recognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
+            @Override
+            public void onSuccess(Text text) {
+                Log.d("OCRKitFlutterView", "Text " + text.getText());
+                Map<String, String> map = new HashMap<>();
+                ArrayList<Map<String, String>> listPoints = new ArrayList<>();
+                map.put("text", text.getText());
+                map.put("path", path);
+                map.put("orientation", "0");
+
+                for (int i = 0; i < text.getTextBlocks().size(); i++) {
+                    Text.TextBlock block = text.getTextBlocks().get(i);
+                    processText(text, path);
+                    for (int j = 0; j < block.getLines().size(); j++) {
+                        Text.Line line = block.getLines().get(j);
+                        for (int k = 0; k < line.getElements().size(); k++) {
+                            Map<String, String> value = new HashMap<>();
+                            Text.Element element = line.getElements().get(k);
+
+                            Point[] elementCornerPoints = element.getCornerPoints();
+                            value.put("text", element.getText());
+                            value.put("cornerPoints", Objects.requireNonNull(elementCornerPoints).toString());
+                            listPoints.add(value);
+                        }
+                    }
+                }
+                map.put("values", listPoints.toString());
+                Log.d("OCRKitFlutterView", "map " + map);
+
+            }
+        }).addOnCanceledListener(new OnCanceledListener() {
+            @Override
+            public void onCanceled() {
+
+            }
+        });
+    }
+
 }

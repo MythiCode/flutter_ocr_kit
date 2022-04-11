@@ -36,10 +36,14 @@ class OCRKitController {
 
   ///Use this method for process image directly with path without need ViewState
   Future<dynamic> processImageFromPathWithoutView(String path) async {
-    if (_channel == null) {
-      _channel = new MethodChannel('plugins/ocr_kit_0');
+    try {
+      if (_channel == null) {
+        _channel = new MethodChannel('plugins/ocrkit');
+      }
+      return _channel?.invokeMethod('processImageFromPathWithoutView', {"path": path});
+    } on PlatformException catch (e) {
+      print("PlatformException ${e.message}");
     }
-    return _channel?.invokeMethod('processImageFromPathWithoutView', {"path": path});
   }
 
   ///Change flash mode between auto, on and off
