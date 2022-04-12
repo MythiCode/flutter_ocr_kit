@@ -1,12 +1,16 @@
 package com.MythiCode.ocrkit;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -25,6 +29,7 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -219,10 +224,13 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     }
 
     private void processImageFromPathWithoutView(final String path) throws IOException {
-        Log.d("OCRKitFlutterView", "processImageFromPathWithoutView" + path);
+        Log.d("OCRKitFlutterView", "processImageFromPathWithoutView: " + path);
+        ExifInterface exif = new ExifInterface(path);
+        int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        int rotationInDegrees = exifToDegrees(rotation);
 
         Bitmap bitmap = BitmapFactory.decodeFile(path);
-        InputImage inputImage = InputImage.fromBitmap(bitmap, 0);
+        final InputImage inputImage = InputImage.fromBitmap(bitmap, rotationInDegrees);
 
         TextRecognizer recognizer =
                 TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
@@ -230,7 +238,6 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         recognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
             @Override
             public void onSuccess(Text text) {
-                Log.d("OCRKitFlutterView", "Text " + text.getText());
                 Map<String, String> map = new HashMap<>();
                 ArrayList<Map<String, String>> listPoints = new ArrayList<>();
                 map.put("text", text.getText());
@@ -264,5 +271,17 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
             }
         });
     }
+
+    private static int exifToDegrees(int exifOrientation) {
+        if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        }
+        return 0;
+    }
+
 
 }
