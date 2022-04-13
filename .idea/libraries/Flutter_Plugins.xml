@@ -1,6 +1,7 @@
 <component name="libraryTable">
   <library name="Flutter Plugins" type="FlutterPluginsLibraryType">
     <CLASSES>
+      <root url="file:///Library/flutter/.pub-cache/hosted/pub.dartlang.org/camerakit-0.0.78-dev1" />
       <root url="file://$PROJECT_DIR$" />
     </CLASSES>
     <JAVADOC />

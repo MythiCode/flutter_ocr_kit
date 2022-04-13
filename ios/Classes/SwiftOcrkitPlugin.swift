@@ -5,10 +5,10 @@ import MLKitVision
 
 public class SwiftOcrkitPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "plugins/ocr_kit_0", binaryMessenger: registrar.messenger())
+        let channel = FlutterMethodChannel(name: "plugins/ocrkit", binaryMessenger: registrar.messenger())
         let instance = SwiftOcrkitPlugin()
 
-        registrar.register(OCRKitFactory(registrar: registrar), withId: "plugins/ocr_kit_0")
+        registrar.register(OCRKitFactory(registrar: registrar), withId: "plugins/ocr_kit")
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
