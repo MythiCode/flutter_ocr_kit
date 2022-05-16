@@ -4,6 +4,7 @@ import 'package:camerakit/CameraKitController.dart';
 import 'package:camerakit/CameraKitView.dart';
 import 'package:flutter/material.dart';
 import 'package:ocrkit/OCRKitController.dart';
+import 'package:ocrkit/OCRKitView.dart';
 // import 'package:ocrkit/OCRKitView.dart';
 
 void main() {

@@ -102,6 +102,10 @@ class CameraViewX(
         relativeLayout.addView(barcodeFrame)
         startCamera()
         Log.e(ContentValues.TAG, "initCamera:")
+        if (isTakePictureMode) {
+            Log.e(ContentValues.TAG, "isTakePictureMode: $isTakePictureMode")
+
+        }
     }
 
     private val flashMode: Int

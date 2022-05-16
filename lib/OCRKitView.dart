@@ -137,7 +137,7 @@ class NativeCameraKitController {
   OCRKitView widget;
 
   NativeCameraKitController._(int id, this.context, this.widget)
-      : _channel = new MethodChannel('plugins/ocrkit' + id.toString());
+      : _channel = new MethodChannel('plugins/ocrkit' );
 
   final MethodChannel _channel;
 

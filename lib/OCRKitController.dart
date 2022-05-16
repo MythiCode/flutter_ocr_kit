@@ -60,19 +60,6 @@ class OCRKitController {
   void setScanForText(bool isScanningForText) {
     cameraKitView.viewState.controller!.setScanForText(isScanningForText);
   }
-  //
-  // void nativeHandeler(bool isScanningForText) {
-  //   _channel.setMethodCallHandler(nativeMethodCallHandler);
-  // }
-  //
-  // Future<dynamic> nativeMethodCallHandler(MethodCall methodCall) async {
-  //   if (methodCall.method == "onTextRead") {
-  //     widget.onTextRead(methodCall.arguments["barcode"], methodCall.arguments["values"], methodCall.arguments["path"],
-  //         methodCall.arguments["orientation"]);
-  //   }
-  //
-  //   return null;
-  // }
 
 // initCamera() {
 //   cameraKitView.viewState.controller.initCamera();

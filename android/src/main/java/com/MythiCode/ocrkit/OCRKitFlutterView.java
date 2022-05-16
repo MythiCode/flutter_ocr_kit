@@ -25,6 +25,8 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -260,7 +262,9 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
                 }
                 map.put("values", listPoints.toString());
                 Log.d("OCRKitFlutterView", "map " + map);
-                result.success(map.toString());
+                Gson gson = new Gson();
+                String json = gson.toJson(map);
+                result.success(json);
             }
         }).addOnCanceledListener(new OnCanceledListener() {
             @Override

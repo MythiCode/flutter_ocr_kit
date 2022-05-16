@@ -2,6 +2,7 @@ package com.MythiCode.ocrkit;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,6 +31,7 @@ public class CameraBaseView implements PlatformView {
 //            throw new RuntimeException("You cannot use barcode reader for reading barcode");
 //        }
 
+        Log.e("CameraBaseView", "initCamera:isTakePictureMode " + isTakePictureMode);
         cameraViewInterface = new CameraViewX(activity, flutterMethodListener);
 
 //        if (isTakePictureMode)
@@ -54,10 +56,6 @@ public class CameraBaseView implements PlatformView {
 
     public void processImageFromPath(String path) {
         cameraViewInterface.processImageFromPath(path);
-    }
-
-    public void processImageFromPathWithoutView(String path) {
-        cameraViewInterface.processImageFromPathWithoutView(path);
     }
 
     public void takePicture(final MethodChannel.Result result) {
