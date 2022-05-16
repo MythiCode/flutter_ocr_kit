@@ -102,10 +102,6 @@ class CameraViewX(
         relativeLayout.addView(barcodeFrame)
         startCamera()
         Log.e(ContentValues.TAG, "initCamera:")
-        if (isTakePictureMode) {
-            Log.e(ContentValues.TAG, "isTakePictureMode: $isTakePictureMode")
-
-        }
     }
 
     private val flashMode: Int
@@ -115,6 +111,7 @@ class CameraViewX(
             'A' -> ImageCapture.FLASH_MODE_AUTO
             else -> ImageCapture.FLASH_MODE_AUTO
         }
+
 
     private fun prepareOptimalSize() {
         val width = previewView!!.width
@@ -213,7 +210,7 @@ class CameraViewX(
                         )
                     )
                     .build()
-                //preview!!.setSurfaceProvider(previewView!!.surfaceProvider)
+
                 preview!!.setSurfaceProvider(previewView!!.createSurfaceProvider())
 
                 imageCapture = ImageCapture.Builder()
@@ -227,6 +224,9 @@ class CameraViewX(
                     .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
                     .build()
 
+                cameraProviderFuture!!.get().bind(preview!!, imageAnalyzer)
+
+
                 cameraSelector =
                     if (userCameraSelector == 0) CameraSelector.DEFAULT_BACK_CAMERA else CameraSelector.DEFAULT_FRONT_CAMERA
                 bindCamera()
@@ -236,6 +236,29 @@ class CameraViewX(
                 e.printStackTrace()
             }
         }, ContextCompat.getMainExecutor(activity))
+        if (isTakePictureMode) {
+            Log.e(ContentValues.TAG, "isTakePictureMode: $isTakePictureMode")
+            cameraExecutor.execute {
+                Log.e(ContentValues.TAG, "isTakePictureMode: $isTakePictureMode")
+            }
+        }
+    }
+
+    private fun onTextFound(foundText: Text) {
+        //Log.e("TAG", "We got new text: $foundText")
+        processText(foundText, "")
+    }
+
+    private val imageAnalyzer by lazy {
+        ImageAnalysis.Builder()
+            .setTargetAspectRatio(AspectRatio.RATIO_16_9)
+            .build()
+            .also {
+                it.setAnalyzer(
+                    cameraExecutor,
+                    TextReaderAnalyzer(::onTextFound)
+                )
+            }
     }
 
     private fun setFlashBarcodeReader() {
@@ -244,11 +267,28 @@ class CameraViewX(
         }
     }
 
+    private fun ProcessCameraProvider.bind(
+        preview: Preview,
+        imageAnalyzer: ImageAnalysis
+    ) = try {
+        unbindAll()
+        bindToLifecycle(
+            (activity as LifecycleOwner),
+            CameraSelector.DEFAULT_BACK_CAMERA,
+            preview,
+            imageAnalyzer
+        )
+    } catch (ise: IllegalStateException) {
+        // Thrown if binding is not done from the main thread
+        Log.e("TAG", "Binding failed", ise)
+    }
+
     private fun bindCamera() {
         cameraProvider!!.unbind()
         camera = cameraProvider!!.bindToLifecycle(
             (activity as LifecycleOwner), cameraSelector!!, preview, imageCapture
         )
+
         setFlashBarcodeReader()
     }
 
@@ -441,7 +481,6 @@ class CameraViewX(
     }
 
     override fun processImageFromPathWithoutView(path: String) {
-        Log.d(tag, "processImageFromPathWithoutView")
         try {
             val bitmap = BitmapFactory.decodeFile(path)
             val inputImage = InputImage.fromBitmap(bitmap, 0)
