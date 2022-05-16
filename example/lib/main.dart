@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:camerakit/CameraKitController.dart';
 import 'package:camerakit/CameraKitView.dart';
 import 'package:flutter/material.dart';
@@ -44,9 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
   takePicture() async {
     try {
       String? path = await cc!.takePicture();
-      final result = await OCRKitController().processImageFromPathWithoutView(path!);
+      final result = await oc.processImageFromPathWithoutView(path!);
+
+      print("RESULT ===========================================================> $result");
       Map<String, dynamic> data = jsonDecode(result);
-      print(data);
+      print("data ====> $data");
       print("Done!");
     } catch (e) {
       print("Exeption $e");
@@ -64,8 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton:
-          FloatingActionButton(onPressed: () => takePicture(), child: const Icon(Icons.camera)),
+      floatingActionButton: FloatingActionButton(onPressed: () => takePicture(), child: const Icon(Icons.camera)),
       body: Center(
         child: CameraKitView(cameraKitController: cc),
       ),

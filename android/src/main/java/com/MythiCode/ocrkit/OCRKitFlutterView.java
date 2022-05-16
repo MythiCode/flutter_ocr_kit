@@ -1,16 +1,12 @@
 package com.MythiCode.ocrkit;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.media.ExifInterface;
-import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 
@@ -29,7 +25,6 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,10 +45,12 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     private final ActivityPluginBinding activityPluginBinding;
     private CameraBaseView cameraView;
     FlutterMethodListener flutterMethodListener;
+    MethodChannel.Result resultTest;
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
         Log.e("OCRKitFlutterView", "onMethodCall:" + call.method);
+        resultTest = result;
         switch (call.method) {
             case "requestPermission":
                 if (ActivityCompat.checkSelfPermission(activityPluginBinding.getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -136,7 +133,8 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
             case "processImageFromPathWithoutView":
                 String path1 = call.argument("path");
                 try {
-                    processImageFromPathWithoutView(path1);
+                    //  result.success(processImageFromPathWithoutView(path1));
+                    processImageFromPathWithoutView(path1, result);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -175,6 +173,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
     @Override
     public void onTextRead(String text, String values, String path) {
+        Log.d("OCRKitFlutterView", "onTextRead");
         HashMap<String, Object> arguments = new HashMap<>();
         arguments.put("barcode", text);
         arguments.put("values", values);
@@ -193,7 +192,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     }
 
     private void processText(Text text, String path) {
-        Log.d("OCRKitFlutterView", "processText" + text.getText());
+        Log.d("OCRKitFlutterView", "processText => " + text.getText());
         ArrayList<LineModel> lineModels = new ArrayList<>();
         for (int i = 0; i < text.getTextBlocks().size(); i++) {
             for (int j = 0; j < text.getTextBlocks().get(i).getLines().size(); j++) {
@@ -212,7 +211,6 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         Log.d("OCRKitFlutterView", "lineModels" + lineModels);
     }
 
-
     @Override
     public void onTakePictureFailed(final MethodChannel.Result result, final String errorCode, final String errorMessage) {
         activityPluginBinding.getActivity().runOnUiThread(new Runnable() {
@@ -223,7 +221,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         });
     }
 
-    private void processImageFromPathWithoutView(final String path) throws IOException {
+    private void processImageFromPathWithoutView(final String path, final MethodChannel.Result result) throws IOException {
         Log.d("OCRKitFlutterView", "processImageFromPathWithoutView: " + path);
         ExifInterface exif = new ExifInterface(path);
         int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
@@ -235,10 +233,10 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         TextRecognizer recognizer =
                 TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
 
+        final Map<String, String> map = new HashMap<>();
         recognizer.process(inputImage).addOnSuccessListener(new OnSuccessListener<Text>() {
             @Override
             public void onSuccess(Text text) {
-                Map<String, String> map = new HashMap<>();
                 ArrayList<Map<String, String>> listPoints = new ArrayList<>();
                 map.put("text", text.getText());
                 map.put("path", path);
@@ -262,7 +260,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
                 }
                 map.put("values", listPoints.toString());
                 Log.d("OCRKitFlutterView", "map " + map);
-
+                result.success(map.toString());
             }
         }).addOnCanceledListener(new OnCanceledListener() {
             @Override
@@ -270,6 +268,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
             }
         });
+
     }
 
     private static int exifToDegrees(int exifOrientation) {
@@ -282,6 +281,5 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         }
         return 0;
     }
-
 
 }
