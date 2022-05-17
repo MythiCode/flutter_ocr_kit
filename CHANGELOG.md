@@ -1,3 +1,7 @@
+## 0.0.27
+
+live scanning added for android. android function bug fixed.
+
 ## 0.0.26
 
 live scanning added for ios. android bugs fixed and functions added.
