@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.media.ExifInterface;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -24,8 +23,6 @@ import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
-
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
-        Log.e("OCRKitFlutterView", "onMethodCall:" + call.method);
+        //  Log.e("OCRKitFlutterView", "onMethodCall:" + call.method);
         resultTest = result;
         switch (call.method) {
             case "requestPermission":
@@ -135,7 +132,6 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
             case "processImageFromPathWithoutView":
                 String path1 = call.argument("path");
                 try {
-                    //  result.success(processImageFromPathWithoutView(path1));
                     processImageFromPathWithoutView(path1, result);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -153,7 +149,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
     public OCRKitFlutterView(ActivityPluginBinding activityPluginBinding, BinaryMessenger binaryMessenger, int viewId) {
         this.channel = new MethodChannel(binaryMessenger, "plugins/ocrkit");
-        Log.e("CHANNEL", "plugins/ocrkit" + viewId);
+        //   Log.e("CHANNEL", "plugins/ocrkit" + viewId);
         this.activityPluginBinding = activityPluginBinding;
         this.channel.setMethodCallHandler(this);
         if (getCameraView() == null) {
@@ -175,7 +171,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
 
     @Override
     public void onTextRead(String text, String values, String path) {
-        Log.d("OCRKitFlutterView", "onTextRead");
+        //   Log.d("OCRKitFlutterView", "onTextRead");
         HashMap<String, Object> arguments = new HashMap<>();
         arguments.put("barcode", text);
         arguments.put("values", values);
@@ -194,7 +190,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     }
 
     private void processText(Text text, String path) {
-        Log.d("OCRKitFlutterView", "processText => " + text.getText());
+        //  Log.d("OCRKitFlutterView", "processText => " + text.getText());
         ArrayList<LineModel> lineModels = new ArrayList<>();
         for (int i = 0; i < text.getTextBlocks().size(); i++) {
             for (int j = 0; j < text.getTextBlocks().get(i).getLines().size(); j++) {
@@ -210,7 +206,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
         Gson gson = new Gson();
         gson.toJson(lineModels);
         onTextRead(text.getText(), new Gson().toJson(lineModels), path);
-        Log.d("OCRKitFlutterView", "lineModels" + lineModels);
+        // Log.d("OCRKitFlutterView", "lineModels" + lineModels);
     }
 
     @Override
@@ -224,7 +220,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
     }
 
     private void processImageFromPathWithoutView(final String path, final MethodChannel.Result result) throws IOException {
-        Log.d("OCRKitFlutterView", "processImageFromPathWithoutView: " + path);
+        //  Log.d("OCRKitFlutterView", "processImageFromPathWithoutView: " + path);
         ExifInterface exif = new ExifInterface(path);
         int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
         int rotationInDegrees = exifToDegrees(rotation);
@@ -261,7 +257,7 @@ public class OCRKitFlutterView implements PlatformView, MethodChannel.MethodCall
                     }
                 }
                 map.put("values", listPoints.toString());
-                Log.d("OCRKitFlutterView", "map " + map);
+                //   Log.d("OCRKitFlutterView", "map " + map);
                 Gson gson = new Gson();
                 String json = gson.toJson(map);
                 result.success(json);

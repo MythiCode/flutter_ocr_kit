@@ -101,7 +101,6 @@ class CameraViewX(
         relativeLayout.addView(previewView)
         relativeLayout.addView(barcodeFrame)
         startCamera()
-        Log.e(ContentValues.TAG, "initCamera:")
     }
 
     private val flashMode: Int

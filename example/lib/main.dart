@@ -40,18 +40,18 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     cc = CameraKitController();
-    print("CameraKitController" + cc.toString());
+  //  print("CameraKitController" + cc.toString());
   }
 
   takePicture() async {
     try {
+      ///Stopwatch stopwatch = Stopwatch()..start();  for testing the speed of process
       String? path = await cc!.takePicture();
       final result = await oc.processImageFromPathWithoutView(path!);
 
-      print("RESULT ===========================================================> $result");
       Map<String, dynamic> data = jsonDecode(result);
-      print("data ====> $data");
-      print("Done!");
+      print("data ===================================================> $data");
+     // print('result executed in ${stopwatch.elapsed}');
     } catch (e) {
       print("Exeption $e");
     }
@@ -68,21 +68,21 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(onPressed: () => oc.takePicture(), child: const Icon(Icons.camera)),
-      // body: Center(
-      //   child: CameraKitView(cameraKitController: cc),
-      // ),
+      floatingActionButton: FloatingActionButton(onPressed: () => takePicture(), child: const Icon(Icons.camera)),
       body: Center(
-        child: OCRKitView(
-            isTakePictureMode: true,
-            onTextRead: (barcode, values, path, orientation) {
-              print("Barcode:========================= $barcode");
-              print("Path:============================ $path");
-              print("values:=========================== $values");
-            },
-            ocrKitController: oc,
-            onPermissionDenied: () {}),
+        child: CameraKitView(cameraKitController: cc),
       ),
+      // body: Center(
+      //   child: OCRKitView(
+      //       isTakePictureMode: true,
+      //       onTextRead: (barcode, values, path, orientation) {
+      //         print("Barcode:========================= $barcode");
+      //         print("Path:============================ $path");
+      //         print("values:=========================== $values");
+      //       },
+      //       ocrKitController: oc,
+      //       onPermissionDenied: () {}),
+      // ),
     );
   }
 }
