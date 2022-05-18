@@ -30,10 +30,7 @@
 .pub-cache/
 .pub/
 /build/
-/example/android/
-/example/ios/
-/example/pubspec.yaml
-/example/test/
+/example/build/
 
 # Web related
 lib/generated_plugin_registrant.dart
@@ -50,10 +47,3 @@ app.*.map.json
 /android/app/release
 
 *.iml
-.gradle
-/local.properties
-/.idea/workspace.xml
-/.idea/libraries
-.DS_Store
-/build
-/captures

@@ -40,7 +40,7 @@ class OCRKitFlutterView : NSObject, FlutterPlatformView, AVCaptureVideoDataOutpu
     
     
     init(registrar: FlutterPluginRegistrar, viewId: Int64, frame: CGRect) {
-         self.channel = FlutterMethodChannel(name: "plugins/ocr_kit_" + String(viewId), binaryMessenger: registrar.messenger())
+         self.channel = FlutterMethodChannel(name: "plugins/ocrkit", binaryMessenger: registrar.messenger())
         self.frame = frame
      }
     

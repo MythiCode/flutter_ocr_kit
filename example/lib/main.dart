@@ -1,11 +1,9 @@
 import 'dart:convert';
-
-import 'package:camerakit/CameraKitController.dart';
-import 'package:camerakit/CameraKitView.dart';
+// import 'package:camerakit/CameraKitController.dart';
+// import 'package:camerakit/CameraKitView.dart';
 import 'package:flutter/material.dart';
 import 'package:ocrkit/OCRKitController.dart';
 import 'package:ocrkit/OCRKitView.dart';
-// import 'package:ocrkit/OCRKitView.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,20 +32,21 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   OCRKitController oc = OCRKitController();
-  CameraKitController? cc;
+  // CameraKitController? cc;
 
   @override
   void initState() {
     super.initState();
-    cc = CameraKitController();
+    // cc = CameraKitController();
   //  print("CameraKitController" + cc.toString());
   }
 
   takePicture() async {
     try {
       ///Stopwatch stopwatch = Stopwatch()..start();  for testing the speed of process
-      String? path = await cc!.takePicture();
-      final result = await oc.processImageFromPathWithoutView(path!);
+      // String path = await cc!.takePicture();
+      String? path = await oc.takePicture();
+      final result = await oc.processImageFromPathWithoutView(path);
 
       Map<String, dynamic> data = jsonDecode(result);
       print("data ===================================================> $data");
@@ -59,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
-    cc?.closeCamera();
+    // cc?.closeCamera();
     super.dispose();
   }
 
@@ -69,20 +68,20 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(title: Text(widget.title)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton(onPressed: () => takePicture(), child: const Icon(Icons.camera)),
-      body: Center(
-        child: CameraKitView(cameraKitController: cc),
-      ),
       // body: Center(
-      //   child: OCRKitView(
-      //       isTakePictureMode: true,
-      //       onTextRead: (barcode, values, path, orientation) {
-      //         print("Barcode:========================= $barcode");
-      //         print("Path:============================ $path");
-      //         print("values:=========================== $values");
-      //       },
-      //       ocrKitController: oc,
-      //       onPermissionDenied: () {}),
+      //   child: CameraKitView(cameraKitController: cc),
       // ),
+      body: Center(
+        child: OCRKitView(
+            isTakePictureMode: false,
+            onTextRead: (barcode, values, path, orientation) {
+              print("Barcode:========================= $barcode");
+              print("Path:============================ $path");
+              print("values:=========================== $values");
+            },
+            ocrKitController: oc,
+            onPermissionDenied: () {}),
+      ),
     );
   }
 }

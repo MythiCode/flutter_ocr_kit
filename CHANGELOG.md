@@ -1,3 +1,11 @@
+## 0.0.29
+
+minor changes.
+
+## 0.0.28
+
+IOS camera bug fixed.
+
 ## 0.0.27
 
 live scanning added for android. android function bug fixed.
